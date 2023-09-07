@@ -1,8 +1,8 @@
-name: Create translation PR
+name: Create PR
 
 on:
   push:
-    branches: [ translation/* ]
+    branches: [ temp/* ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,6 +22,16 @@ jobs:
         run: |
           echo "SHORT_REF=`echo ${{ github.ref }} | cut -d/ -f3-`" >> $GITHUB_ENV
 
+      - name: Move files
+        run: |
+          mv temp/a.rm temp2/a.rm
+          mv temp/b.rm temp2/b.rm
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add resources/en.lproj/InfoPlist.strings resources/ja.lproj/InfoPlist.strings
+          git diff-index --quiet HEAD || git commit -m "Move InfoPlist.strings files"
+          git diff-index --quiet HEAD || git push
+
       - name: Create Pull Request
         uses: devops-infra/action-pull-request@v0.5.0
         with:
@@ -29,11 +39,3 @@ jobs:
           target_branch: 'develop'
           title: '[번역본 업데이트] ${{ env.SHORT_REF }}'
           get_diff: true
-
-      - name: Deploy Dev
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: 'Deploy To Testflight - Dev'
-          token: ${{ secrets.COMMON_ACCOUNT_PAT }}
-          inputs: '{ "changelog": "[번역본 업데이트] ${{ env.SHORT_REF }}" }'
-          ref: ${{ github.ref }}
