@@ -1,0 +1,39 @@
+name: Create translation PR
+
+on:
+  push:
+    branches: [ translation/* ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Set environment variables
+        run: |
+          echo "SHORT_REF=`echo ${{ github.ref }} | cut -d/ -f3-`" >> $GITHUB_ENV
+
+      - name: Create Pull Request
+        uses: devops-infra/action-pull-request@v0.5.0
+        with:
+          github_token: ${{ secrets.API_TOKEN_GITHUB }}
+          target_branch: 'develop'
+          title: '[번역본 업데이트] ${{ env.SHORT_REF }}'
+          get_diff: true
+
+      - name: Deploy Dev
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: 'Deploy To Testflight - Dev'
+          token: ${{ secrets.COMMON_ACCOUNT_PAT }}
+          inputs: '{ "changelog": "[번역본 업데이트] ${{ env.SHORT_REF }}" }'
+          ref: ${{ github.ref }}
