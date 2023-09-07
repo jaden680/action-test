@@ -31,8 +31,6 @@ jobs:
           git add --all
           git diff-index --quiet HEAD || git commit -m "Move files"
           git push -f -u origin ${{ github.ref }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
 
       - name: Create Pull Request
         uses: devops-infra/action-pull-request@v0.5.0
