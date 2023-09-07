@@ -24,18 +24,18 @@ jobs:
 
       - name: Move files
         run: |
-          mv temp/a.rm temp2/a.rm
-          mv temp/b.rm temp2/b.rm
+          mv temp2/a.rm temp/a.rm
+          mv temp2/b.rm temp/b.rm
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add resources/en.lproj/InfoPlist.strings resources/ja.lproj/InfoPlist.strings
-          git diff-index --quiet HEAD || git commit -m "Move InfoPlist.strings files"
+          git add --all
+          git diff-index --quiet HEAD || git commit -m "Move files"
           git diff-index --quiet HEAD || git push
 
       - name: Create Pull Request
         uses: devops-infra/action-pull-request@v0.5.0
         with:
           github_token: ${{ secrets.API_TOKEN_GITHUB }}
-          target_branch: 'develop'
-          title: '[번역본 업데이트] ${{ env.SHORT_REF }}'
+          target_branch: 'main'
+          title: '[File Move Test] ${{ env.SHORT_REF }}'
           get_diff: true
