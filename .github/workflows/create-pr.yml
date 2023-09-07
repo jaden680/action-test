@@ -22,6 +22,14 @@ jobs:
         run: |
           echo "SHORT_REF=`echo ${{ github.ref }} | cut -d/ -f3-`" >> $GITHUB_ENV
 
+      - name: Create Pull Request
+        uses: devops-infra/action-pull-request@v0.5.0
+        with:
+          github_token: ${{ secrets.API_TOKEN_GITHUB }}
+          target_branch: 'main'
+          title: '[File Move Test] ${{ env.SHORT_REF }}'
+          get_diff: true
+
       - name: Move files
         run: |
           mv temp2/a.rm temp/a.rm
@@ -30,12 +38,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add --all
           git diff-index --quiet HEAD || git commit -m "Move files"
-          git diff-index --quiet HEAD || git push
-
-      - name: Create Pull Request
-        uses: devops-infra/action-pull-request@v0.5.0
-        with:
-          github_token: ${{ secrets.API_TOKEN_GITHUB }}
-          target_branch: 'main'
-          title: '[File Move Test] ${{ env.SHORT_REF }}'
-          get_diff: true
+          git push
