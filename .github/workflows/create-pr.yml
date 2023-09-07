@@ -38,4 +38,6 @@ jobs:
           git config --local user.name "GitHub Action"
           git add --all
           git diff-index --quiet HEAD || git commit -m "Move files"
-          git push
+          git push -f -u origin ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
